@@ -1,0 +1,197 @@
+{
+    "name": "awema-pl/module-prestashop",
+    "description": "Module prestashop",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Karol Golec",
+            "email": "karolgolec10@gmail.com",
+            "homepage": "https://github.pl/awema-pl/module-prestashop",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "karolgolec10@gmail.com"
+    },
+    "homepage": "https://github.com/awema-pl/module-prestashop",
+    "keywords": [
+        "Laravel",
+        "Prestashop"
+    ],
+    "require": {
+        "awema-pl/module-assets": "dev-master",
+        "awema-pl/module-auth": "dev-master",
+        "awema-pl/module-base-js": "dev-master",
+        "awema-pl/module-context-menu": "dev-master",
+        "awema-pl/module-filter-wrapper": "dev-master",
+        "awema-pl/module-form-builder": "dev-master",
+        "awema-pl/module-indigo-layout": "dev-master",
+        "awema-pl/module-localization-helper": "dev-master",
+        "awema-pl/module-modal-window": "dev-master",
+        "awema-pl/module-navigation": "dev-master",
+        "awema-pl/module-page-map": "dev-master",
+        "awema-pl/module-permission": "dev-master",
+        "awema-pl/module-repository": "dev-master",
+        "awema-pl/module-sticky-params": "dev-master",
+        "awema-pl/module-system-notify": "dev-master",
+        "awema-pl/module-tab-builder": "dev-master",
+        "awema-pl/module-table-builder": "dev-master",
+        "awema-pl/module-theme-switcher": "dev-master",
+        "awema-pl/module-virtual-tour": "dev-master",
+        "larapack/config-writer": "^1.0",
+        "betterapp/laravel-db-encrypter": "^1.0",
+        "lcobucci/jwt": "^3.3",
+        "illuminate/support": "~5|~6|~7|~8|~9",
+        "ext-curl": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "AwemaPL\\Prestashop\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AwemaPL\\Prestashop\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit --colors=always --configuration phpunit.xml.dist --debug"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AwemaPL\\Prestashop\\PrestashopServiceProvider"
+            ],
+            "aliases": {
+                "Installation": "AwemaPL\\Prestashop\\Facades\\Prestashop"
+            }
+        }
+    },
+
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../Theme-switcher",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../System-notify",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../Base-js",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../Navigation",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../Tab-builder",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../Context-menu",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../Localization-helper",
+            "options": {
+                "symlink": true
+            }
+        },        {
+            "type": "path",
+            "url": "../Table-builder",
+            "options": {
+                "symlink": true
+            }
+        },        {
+            "type": "path",
+            "url": "../Assets",
+            "options": {
+                "symlink": true
+            }
+        },        {
+            "type": "path",
+            "url": "../Auth",
+            "options": {
+                "symlink": true
+            }
+        },        {
+            "type": "path",
+            "url": "../Filter-wrapper",
+            "options": {
+                "symlink": true
+            }
+        },        {
+            "type": "path",
+            "url": "../Form-builder",
+            "options": {
+                "symlink": true
+            }
+        },        {
+            "type": "path",
+            "url": "../Indigo-layout",
+            "options": {
+                "symlink": true
+            }
+        },        {
+            "type": "path",
+            "url": "../Modal-window",
+            "options": {
+                "symlink": true
+            }
+        },        {
+            "type": "path",
+            "url": "../Page-map",
+            "options": {
+                "symlink": true
+            }
+        },        {
+            "type": "path",
+            "url": "../Permission",
+            "options": {
+                "symlink": true
+            }
+        },        {
+            "type": "path",
+            "url": "../Repository",
+            "options": {
+                "symlink": true
+            }
+        },        {
+            "type": "path",
+            "url": "../Sticky-params",
+            "options": {
+                "symlink": true
+            }
+        },        {
+            "type": "path",
+            "url": "../Virtual-tour",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

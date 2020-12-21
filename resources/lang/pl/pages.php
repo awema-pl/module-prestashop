@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'admin' => [
+        'installation' =>[
+            'meta_title' => 'Instalacja modułu PrestaShop',
+            'headline' => 'Instalacja modułu PrestaShop',
+            'meta_description' => 'Instalacja modułu PrestaShop w aplikacji',
+            'send_text' => 'Instaluj',
+            'will_be_execute_migrations' => 'Migracje pakietu zostaną uruchomione',
+        ],
+        'setting'=>[
+            'meta_title' => 'Ustawienia',
+            'headline' => 'Ustawienia',
+            'meta_description' => 'Ustawienia PrestaShop w systemie.',
+            'settings' =>'Ustawienia',
+            'key' =>'Klucz',
+            'value' =>'Wartość',
+            'edit_account' => 'Edycja konta',
+            'options' =>'Opcje',
+            'edit' =>'Edytuj',
+            'save' => 'Zapisz',
+        ],
+    ],
+    'user' => [
+        'shop'=>[
+            'meta_title' => 'Sklepy',
+            'headline' => 'Sklepy',
+            'meta_description' => 'Sklepy PrestaShop w systemie.',
+            'shops' =>'Sklepy',
+            'yes' => 'Tak',
+            'no' => 'Nie',
+            'connected_at' =>'Połączono',
+            'connect_shop' => 'Połącz sklep',
+            'edit_shop' => 'Edycja sklepu',
+            'options' =>'Opcje',
+            'edit' =>'Edytuj',
+            'delete' =>'Usuń',
+            'are_you_sure_delete'=>'Czy na pewno usunąć?',
+            'name' => 'Nazwa',
+            'url' => 'Adres www',
+            'api_key' => 'Klucz API',
+            'generate_api_key' => 'Proszę wygenerować klucz API w panelu administratora PrestaShop "Zaawansowane > API".',
+            'local_language' => 'Język lokalny',
+            'please_fill_url_api_key_to_select_local_Language' =>'Proszę uzupełnić adres www i klucz API, aby zaznaczyć język lokalny.',
+            'search_local_language' => 'Wyszukaj język lokalny',
+            'check_connection' =>'Sprawdź połączenie',
+            'confirm' =>'Potwierdź',
+            'save' => 'Zapisz',
+            'connect' =>'Połącz',
+        ],
+    ],
+];
