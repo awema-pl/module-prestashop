@@ -11,11 +11,10 @@ class ValidApiKey implements Rule
     /** @var PrestashopClient $prestashopClient */
     protected $prestashopClient;
 
-    protected $message;
+    private $message;
 
     public function __construct(PrestashopClient $prestashopClient)
     {
-        parent::__construct();
         $this->prestashopClient = $prestashopClient;
     }
 
@@ -28,12 +27,9 @@ class ValidApiKey implements Rule
      */
     public function passes($attribute, $value)
     {
-        try{
-            $apiPrestashop = $this->prestashop->getPrestashopApi(request()->url, request()->api_key);
-            $apiPrestashop->checkConnection();
-        } catch (PrestashopApiException $e){
-            $this->message = $e->getErrorUserMessage() ?? $e->getErrorMessage() ?? $e->getMessage();
-        }
+        $apiPrestashop = $this->prestashopClient->getPrestashopApi(request()->url, request()->api_key);
+        $apiPrestashop->checkConnection();
+        return true;
     }
 
     /**
@@ -43,6 +39,6 @@ class ValidApiKey implements Rule
      */
     public function message()
     {
-        return $this->message();
+        return $this->message;
     }
 }

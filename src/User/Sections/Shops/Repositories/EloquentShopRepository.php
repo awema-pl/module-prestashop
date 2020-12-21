@@ -50,6 +50,10 @@ class EloquentShopRepository extends BaseRepository implements ShopRepository
     public function create(array $data)
     {
         $data['user_id'] = $data['user_id'] ?? Auth::id();
+        $apiPrestashop = $this->prestashopClient->getPrestashopApi($data['url'], $data['api_key']);
+        $resource = $apiPrestashop->get(['resource' =>'languages', 'display' =>'[name]', 'filter[id]' =>'['.$data['shop_language_id'].']']);
+        $languages = $apiPrestashop->toArray($resource);
+        $data['shop_language_name'] =$languages[0]['name'];
         return Shop::create($data);
     }
 
@@ -64,6 +68,10 @@ class EloquentShopRepository extends BaseRepository implements ShopRepository
      */
     public function update(array $data, $id, $attribute = 'id')
     {
+        $apiPrestashop = $this->prestashopClient->getPrestashopApi($data['url'], $data['api_key']);
+        $resource = $apiPrestashop->get(['resource' =>'languages', 'display' =>'[name]', 'filter[id]' =>'['.$data['shop_language_id'].']']);
+        $languages = $apiPrestashop->toArray($resource);
+        $data['shop_language_name'] =$languages[0]['name'];
         return parent::update($data, $id, $attribute);
     }
 
@@ -88,21 +96,21 @@ class EloquentShopRepository extends BaseRepository implements ShopRepository
     }
 
     /**
-     * Select local language
+     * Select language
      *
      * @param string $url
      * @param string $apiKey
      * @return array
      */
-    public function selectLocalLanguage($url, $apiKey)
+    public function selectLanguage($url, $apiKey)
     {
         $apiPrestashop = $this->prestashopClient->getPrestashopApi($url, $apiKey);
-        $resource = $apiPrestashop->get(['resource' =>'languages', 'display' =>'[name,locale]', 'filter[active]' =>'[1]']);
+        $resource = $apiPrestashop->get(['resource' =>'languages', 'display' =>'[id,name]', 'filter[active]' =>'[1]']);
         $languages = $apiPrestashop->toArray($resource);
         $localLanguage = [];
         foreach ($languages as $language){
             array_push($localLanguage, [
-               'id' =>$language['locale'],
+               'id' =>(int)$language['id'],
                'name' =>$language['name'],
             ]);
         }

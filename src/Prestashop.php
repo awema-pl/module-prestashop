@@ -103,8 +103,8 @@ class Prestashop implements PrestashopContract
                 ->delete('{id?}', '\AwemaPL\Prestashop\User\Sections\Shops\Http\Controllers\ShopController@delete')
                 ->name('delete');
             $this->router
-                ->get('/select-local-languages', '\AwemaPL\Prestashop\User\Sections\Shops\Http\Controllers\ShopController@selectLocalLanguage')
-                ->name('select_local_language');
+                ->get('/select-languages', '\AwemaPL\Prestashop\User\Sections\Shops\Http\Controllers\ShopController@selectLanguage')
+                ->name('select_language');
             $this->router
                 ->get('/check-connection/{id?}', '\AwemaPL\Prestashop\User\Sections\Shops\Http\Controllers\ShopController@checkConnection')
                 ->name('check_connection');

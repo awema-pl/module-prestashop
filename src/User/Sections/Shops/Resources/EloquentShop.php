@@ -19,7 +19,8 @@ class EloquentShop extends JsonResource
             'name' => $this->name,
             'url' => $this->url,
            'api_key' => $this->api_key,
-            'local_language' => $this->local_language,
+            'shop_language_id' =>$this->shop_language_id,
+            'shop_language_name' => $this->shop_language_name,
             'created_at' =>$this->created_at->format('Y-m-d H:i:s'),
         ];
     }

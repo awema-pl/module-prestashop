@@ -7,7 +7,7 @@ return [
                 "name" => "Name",
                 "url" => "website address",
                 "api_key" => "API key",
-                "local_language" => "local language"
+                "language" => "language"
             ]
         ]
     ]

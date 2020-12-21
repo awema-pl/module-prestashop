@@ -102,12 +102,12 @@ class ShopController extends Controller
     }
 
     /**
-     * Select local language
+     * Select language
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function selectLocalLanguage(Request $request)
+    public function selectLanguage(Request $request)
     {
         if (!filter_var($request->url, FILTER_VALIDATE_URL)){
             return $this->ajaxNotifyError(_p('prestashop::notifies.user.shop.please_enter_valid_website_address', 'Please enter a valid website address.'), 400);
@@ -115,7 +115,7 @@ class ShopController extends Controller
             return $this->ajaxNotifyError(_p('prestashop::notifies.user.shop.please_enter_api_key', 'Please enter some API key.'), 400);
         }
         $this->prestashopClient->getPrestashopApi($request->url, $request->api_key)->checkConnection();
-        return $this->ajax($this->shops->selectLocalLanguage($request->url, $request->api_key));
+        return $this->ajax($this->shops->selectLanguage($request->url, $request->api_key));
     }
 
     /**

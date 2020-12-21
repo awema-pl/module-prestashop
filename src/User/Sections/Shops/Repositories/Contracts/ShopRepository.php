@@ -51,11 +51,11 @@ interface ShopRepository
     public function find($id, $columns = ['*']);
 
     /**
-     * Select local language
+     * Select language
      *
      * @param string $url
      * @param string $apiKey
      * @return array
      */
-    public function selectLocalLanguage($url, $apiKey);
+    public function selectLanguage($url, $apiKey);
 }

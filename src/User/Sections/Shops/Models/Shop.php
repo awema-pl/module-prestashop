@@ -21,7 +21,7 @@ class Shop extends Model implements ShopContract
      * @var array
      */
     protected $fillable = [
-       'user_id', 'name', 'url', 'api_key', 'local_language',
+       'user_id', 'name', 'url', 'api_key', 'shop_language_id','shop_language_name'
     ];
 
     /**
@@ -31,6 +31,7 @@ class Shop extends Model implements ShopContract
      */
     protected $casts = [
         'user_id' => 'integer',
+        'shop_language_id' =>'integer',
     ];
 
     /**

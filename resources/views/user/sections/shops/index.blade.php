@@ -28,7 +28,7 @@
                             <table-builder :default="table.data">
                                 <tb-column name="name" label="{{ _p('prestashop::pages.user.shop.name', 'Name') }}"></tb-column>
                                 <tb-column name="url" label="{{ _p('prestashop::pages.user.shop.url', 'Website address') }}"></tb-column>
-                                <tb-column name="local_language" label="{{ _p('prestashop::pages.user.shop.local_language', 'Local language') }}"></tb-column>
+                                <tb-column name="shop_language_name" label="{{ _p('prestashop::pages.user.shop.language', 'Language') }}"></tb-column>
                                 <tb-column name="created_at" label="{{ _p('prestashop::pages.user.shop.connected_at', 'Connected at') }}"></tb-column>
                                 <tb-column name="manage" label="{{ _p('prestashop::pages.user.shop.options', 'Options')  }}">
                                     <template slot-scope="col">
@@ -77,10 +77,10 @@
                      {!! _p('prestashop::pages.user.shop.generate_api_key', 'Please generate an API key in the PrestaShop admin panel "Advanced Parameters > Webservice".') !!}
                  </small>
                  <div class="mt-10">
-                     <fb-select name="local_language" :multiple="false" open-fetch options-value="id" options-name="name"
-                                :url="'{{ route('prestashop.user.shop.select_local_language') }}?url=' + AWEMA._store.state.forms['connect'].fields.url + '&api_key=' + AWEMA._store.state.forms['connect'].fields.api_key"
+                     <fb-select name="shop_language_id" :multiple="false" open-fetch options-value="id" options-name="name"
+                                :url="'{{ route('prestashop.user.shop.select_language') }}?url=' + AWEMA._store.state.forms['connect'].fields.url + '&api_key=' + AWEMA._store.state.forms['connect'].fields.api_key"
                                 :disabled="!AWEMA._store.state.forms['connect'] || !AWEMA._store.state.forms['connect'].fields.url || !AWEMA._store.state.forms['connect'].fields.api_key"
-                                placeholder-text=" " label="{{ _p('prestashop::pages.user.shop.local_language', 'Local language') }}">
+                                placeholder-text=" " label="{{ _p('prestashop::pages.user.shop.language', 'Language') }}">
                      </fb-select>
                      <small class="cl-caption" v-if="!AWEMA._store.state.forms['connect'] || !AWEMA._store.state.forms['connect'].fields.url || !AWEMA._store.state.forms['connect'].fields.api_key">
                          {!! _p('prestashop::pages.user.shop.please_fill_url_api_key_to_select_local_Language', 'Please complete the website address and API key to select the local language.') !!}
@@ -99,11 +99,11 @@
                 <fb-input name="url" label="{{ _p('prestashop::pages.user.shop.url', 'Website address') }}"></fb-input>
                 <fb-input name="api_key" label="{{ _p('prestashop::pages.user.shop.api_key', 'API key') }}"></fb-input>
                 <div class="mt-10">
-                    <fb-select name="local_language" :multiple="false" open-fetch auto-fetch options-value="id" options-name="name"
-                               :url="'{{ route('prestashop.user.shop.select_local_language') }}?url=' + AWEMA._store.state.forms['edit_shop'].fields.url + '&api_key=' + AWEMA._store.state.forms['edit_shop'].fields.api_key"
+                    <fb-select name="shop_language_id" :multiple="false" open-fetch auto-fetch options-value="id" options-name="name"
+                               :url="'{{ route('prestashop.user.shop.select_language') }}?url=' + AWEMA._store.state.forms['edit_shop'].fields.url + '&api_key=' + AWEMA._store.state.forms['edit_shop'].fields.api_key"
                                :disabled="!AWEMA._store.state.forms['edit_shop'] || !AWEMA._store.state.forms['edit_shop'].fields.url || !AWEMA._store.state.forms['edit_shop'].fields.api_key"
-                               placeholder-text=" " label="{{ _p('prestashop::pages.user.shop.local_language', 'Local language') }}"
-                               :auto-fetch-value="AWEMA._store.state.editShop.local_language">
+                               placeholder-text=" " label="{{ _p('prestashop::pages.user.shop.language', 'Language') }}"
+                               :auto-fetch-value="AWEMA._store.state.editShop.shop_language_id">
                     </fb-select>
                     <small class="cl-caption" v-if="!AWEMA._store.state.forms['edit_shop'] || !AWEMA._store.state.forms['edit_shop'].fields.url || !AWEMA._store.state.forms['edit_shop'].fields.api_key">
                         {!! _p('prestashop::pages.user.shop.please_fill_url_api_key_to_select_local_Language', 'Please complete the website address and API key to select the local language.') !!}

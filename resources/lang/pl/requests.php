@@ -25,7 +25,7 @@ return [
                 'name' => 'nazwa',
                 'url' =>'adres www',
                 'api_key' =>'klucz API',
-                'local_language' =>'język lokalny',
+                'language' =>'język',
             ],
             'messages'=>[
             ]

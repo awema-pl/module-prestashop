@@ -30,7 +30,7 @@ class UpdateShop extends FormRequest
             'name' => 'required|string|max:255',
             'url' => ['required', 'string', 'max:255', $validApiKey],
             'api_key' => 'required|string|max:255',
-            'local_language' =>'required|string|max:255',
+            'shop_language_id' =>'required|integer',
         ];
     }
 
@@ -46,7 +46,7 @@ class UpdateShop extends FormRequest
             'name' => _p('prestashop::requests.user.shop.attributes.name', 'Name'),
             'url' => _p('prestashop::requests.user.shop.attributes.url', 'website address'),
             'api_key' => _p('prestashop::requests.user.shop.attributes.api_key', 'API key'),
-            'local_language' => _p('prestashop::requests.user.shop.attributes.local_language', 'local language'),
+            'shop_language_id' => _p('prestashop::requests.user.shop.attributes.language', 'language'),
         ];
     }
 

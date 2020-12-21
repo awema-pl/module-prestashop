@@ -14,8 +14,8 @@ class CreatePrestashopShopsTable extends Migration
             $table->string('name');
             $table->string('url');
             $table->string('api_key');
-            $table->integer('id_language');
-            $table->integer('name_language');
+            $table->integer('shop_language_id');
+            $table->string('shop_language_name');
             $table->timestamps();
         });
 
