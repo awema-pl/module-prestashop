@@ -2,8 +2,9 @@
 
 namespace AwemaPL\Prestashop\User\Sections\Shops\Http\Controllers;
 
-use AwemaPL\Prestashop\Client\Contracts\PrestashopClient;
+use AwemaPL\Prestashop\Client\Api\ConnectionValidator;
 use AwemaPL\Prestashop\Client\Api\PrestashopApiException;
+use AwemaPL\Prestashop\Client\PrestashopClient;
 use AwemaPL\Prestashop\User\Sections\Shops\Models\Shop;
 use AwemaPL\Prestashop\Admin\Sections\Settings\Repositories\Contracts\SettingRepository;
 use AwemaPL\Auth\Controllers\Traits\RedirectsTo;
@@ -25,14 +26,10 @@ class ShopController extends Controller
     /** @var SettingRepository */
     protected $settings;
 
-    /** @var PrestashopClient $prestashopClient */
-    protected $prestashopClient;
-
-    public function __construct(ShopRepository $shops, SettingRepository $settings, PrestashopClient $prestashopClient)
+    public function __construct(ShopRepository $shops, SettingRepository $settings)
     {
         $this->shops = $shops;
         $this->settings = $settings;
-        $this->prestashopClient = $prestashopClient;
     }
 
     /**
@@ -114,7 +111,10 @@ class ShopController extends Controller
         } else if (empty($request->api_key)){
             return $this->ajaxNotifyError(_p('prestashop::notifies.user.shop.please_enter_api_key', 'Please enter some API key.'), 400);
         }
-        $this->prestashopClient->getPrestashopApi($request->url, $request->api_key)->checkConnection();
+        $error = ConnectionValidator::fail($request->url, $request->api_key);
+        if (!empty($error)){
+            return $this->ajaxNotifyError($error, 422);
+        }
         return $this->ajax($this->shops->selectLanguage($request->url, $request->api_key));
     }
 
@@ -129,7 +129,10 @@ class ShopController extends Controller
     {
         $this->authorize('isOwner', Shop::find($id));
         $shop = $this->shops->find($id);
-        $this->prestashopClient->getPrestashopApi($shop->url, $shop->api_key)->checkConnection();
+        $error = ConnectionValidator::fail($shop->url, $shop->api_key);
+        if (!empty($error)){
+            return $this->ajaxNotifyError($error, 422);
+        }
         return notify(_p('prestashop::notifies.user.shop.success_connected_shop', 'Success connected shop.'));
     }
 

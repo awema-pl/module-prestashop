@@ -2,21 +2,14 @@
 
 namespace AwemaPL\Prestashop\User\Sections\Shops\Http\Requests\Rules;
 use AwemaPL\Baselinker\Client\Api\TokenValidator;
+use AwemaPL\Prestashop\Client\Api\ConnectionValidator;
 use AwemaPL\Prestashop\Client\Api\PrestashopApiException;
 use Illuminate\Contracts\Validation\Rule;
 use AwemaPL\Prestashop\Client\Contracts\PrestashopClient;
 
 class ValidApiKey implements Rule
 {
-    /** @var PrestashopClient $prestashopClient */
-    protected $prestashopClient;
-
     private $message;
-
-    public function __construct(PrestashopClient $prestashopClient)
-    {
-        $this->prestashopClient = $prestashopClient;
-    }
 
     /**
      * Determine if the validation rule passes.
@@ -27,9 +20,8 @@ class ValidApiKey implements Rule
      */
     public function passes($attribute, $value)
     {
-        $apiPrestashop = $this->prestashopClient->getPrestashopApi(request()->url, request()->api_key);
-        $apiPrestashop->checkConnection();
-        return true;
+        $this->message = ConnectionValidator::fail(request()->url, request()->api_key);
+        return empty($this->message);
     }
 
     /**

@@ -17,8 +17,6 @@ use AwemaPL\Prestashop\Admin\Sections\Installations\Http\Middleware\Installation
 use AwemaPL\Prestashop\Admin\Sections\Installations\Http\Middleware\RouteMiddleware;
 use AwemaPL\Prestashop\Contracts\Prestashop as PrestashopContract;
 use Illuminate\Support\Facades\Event;
-use AwemaPL\Prestashop\Client\PrestashopClient as PrestashopClient;
-use AwemaPL\Prestashop\Client\Contracts\PrestashopClient as PrestashopClientContract;
 
 class PrestashopServiceProvider extends AwemaProvider
 {
@@ -87,7 +85,6 @@ class PrestashopServiceProvider extends AwemaProvider
      */
     protected function registerServices()
     {
-        $this->app->bind(PrestashopClientContract::class, PrestashopClient::class);
     }
 
     /**

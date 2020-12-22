@@ -1,16 +1,22 @@
 <?php
 namespace AwemaPL\Prestashop\Client\Contracts;
 use AwemaPL\Prestashop\Client\Api\PrestashopApi;
+use AwemaPL\Prestashop\Client\Api\Request\Contracts\Language as LanguageContract;
+use AwemaPL\Prestashop\Client\Api\Request\Contracts\Permission as PermissionContract;
 
 interface PrestashopClient
 {
     /**
-     * Get PrestaShop API
+     * Languages
      *
-     * @param $url
-     * @param $apiKey
-     * @param false $debug
-     * @return PrestashopApi
+     * @return LanguageContract
      */
-    public function getPrestashopApi($url, $apiKey, $debug = false);
+    public function languages(): LanguageContract;
+
+    /**
+     * Permissions
+     *
+     * @return PermissionContract
+     */
+    public function permissions(): PermissionContract;
 }

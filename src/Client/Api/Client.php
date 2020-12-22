@@ -7,34 +7,26 @@ use MrGenis\Library\XmlToArray;
 use RuntimeException;
 use SimpleXMLElement;
 
-class PrestashopApi
+class Client
 {
-
-    /** @var string Website address */
-    protected $url;
-
-    /** @var string Api key */
-    protected $apiKey;
-
-    /** @var boolean is debug activated */
-    protected $debug;
 
     /** @var string PS version */
     protected $version;
+    
+    /** @var Config $config */
+    protected $config;
 
     /** @var array compatible versions of PrestaShop WebService */
     const PS_COMPATIBLE_VERSION_MIN = '1.4.0.0';
     const PS_COMPATIBLE_VERSION_MAX = '1.7.99.99';
 
-    public function __construct($url, $apiKey, $debug = false)
+    public function __construct(Config $config)
     {
         if (!extension_loaded('curl')) {
             $exception = 'Please activate the PHP extension \'curl\' to allow use of PrestaShop WebService library';
             throw new RuntimeException($exception);
         }
-        $this->url = $url;
-        $this->apiKey = $apiKey;
-        $this->debug = $debug;
+        $this->config = $config;
         $this->version = 'unknown';
     }
 
@@ -78,20 +70,15 @@ class PrestashopApi
         $details = isset($request['response']) ? $this->parseXML($request['response'], true) : null;
         $httpStatus = $request['status_code'];
         $message = 'Error request to the PrestaShop API.' . isset($messages[$httpStatus]) ? sprintf(' %s %s', $httpStatus, $messages[$httpStatus]) : '';
-        $errorUserMessage = null;
-        if (isset($details->errors->error)) {
-            $code = (int)$details->errors->error->code;
-            $errorMessage = sprintf('%s (%s).', $details->errors->error->message, $code);
-            $message .= ' ' . $errorMessage;
-            if (isset($prestashopUserMessages[$code])) {
-                $errorUserMessage = $prestashopUserMessages[$code];
-            }
-            else {
-                $errorUserMessage = _p('prestashop::exceptions.user.shop.error_request_prestashop_api', 'Error request to the PrestaShop API. :error', ['error' => $errorMessage]);
-            }
+        if (!isset($details->errors->error)) {
+            throw new PrestashopApiException($message, PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, $request['status_code'], null, null, $details, $this->config->isDebug());
+        } else {
+            $prestashopCode = (int)$details->errors->error->code;
+            $errorMessage = sprintf('%s (%s).', $details->errors->error->message, $prestashopCode);
+            $message .= sprintf(' %s', $errorMessage);
+            $errorUserMessage = isset($prestashopUserMessages[$prestashopCode]) ? $prestashopUserMessages[$prestashopCode] : _p('prestashop::exceptions.user.shop.error_request_prestashop_api', 'Error request to the PrestaShop API. :error', ['error' => $errorMessage]);
+            throw new PrestashopApiException($message, PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, $request['status_code'], null, $errorUserMessage, $details, $this->config->isDebug());
         }
-        throw new PrestashopApiException($message, PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, $request['status_code'],
-            null, $errorUserMessage, $details, $this->debug);
     }
 
     /**
@@ -109,7 +96,7 @@ class PrestashopApi
                 null, _p('prestashop::exceptions.user.shop.error_incompatibile_version', 'PrestaShop error. Incompatible version (minimum version: :min, maksimum version: :max).', [
                     'min' => self::PS_COMPATIBLE_VERSION_MIN,
                     'max' => self::PS_COMPATIBLE_VERSION_MAX
-                ]), null, $this->debug);
+                ]), null, $this->config->isDebug());
         }
     }
 
@@ -128,7 +115,7 @@ class PrestashopApi
             CURLOPT_RETURNTRANSFER => true,
             CURLINFO_HEADER_OUT => true,
             CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-            CURLOPT_USERPWD => $this->apiKey . ':',
+            CURLOPT_USERPWD => $this->config->getApiKey() . ':',
             CURLOPT_HTTPHEADER => ['Expect:'],
             CURLOPT_SSL_VERIFYPEER => config('app.env') === 'local' ? 0 : 1,
             CURLOPT_SSL_VERIFYHOST => config('app.env') === 'local' ? 0 : 2
@@ -153,12 +140,12 @@ class PrestashopApi
         if ($status_code === 0 || $error) {
             $httpStatus = ($status_code) ? $status_code : 400;
             throw new PrestashopApiException('Error request to the PrestaShop API. ' . $error, PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, $httpStatus,
-                null, _p('prestashop::exceptions.user.shop.error_request_prestashop_api', 'Error request to the PrestaShop API. :error', ['error' => $error]), null, $this->debug);
+                null, _p('prestashop::exceptions.user.shop.error_request_prestashop_api', 'Error request to the PrestaShop API. :error', ['error' => $error]), null, $this->config->isDebug());
         }
         $index = $info['header_size'];
         if ($index === false && $curl_params[CURLOPT_CUSTOMREQUEST] !== 'HEAD') {
             throw new PrestashopApiException('Error request to the PrestaShop API. Bad HTTP response.', PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, 400,
-                null, _p('prestashop::exceptions.user.shop.error_request_prestashop_api', 'Error request to the PrestaShop API. :error', ['error' => 'Bad HTTP response']), null, $this->debug);
+                null, _p('prestashop::exceptions.user.shop.error_request_prestashop_api', 'Error request to the PrestaShop API. :error', ['error' => 'Bad HTTP response']), null, $this->config->isDebug());
         }
         $header = substr($response, 0, $index);
         $body = substr($response, $index);
@@ -225,7 +212,7 @@ class PrestashopApi
      */
     public function dumpDebug($title, $content)
     {
-        if ($this->debug) {
+        if ($this->config->isDebug()) {
             dump('START ' . $title . "\n" . $content . "\n" . 'END ' . $title . "\n" . "\n");
         }
     }
@@ -259,14 +246,14 @@ class PrestashopApi
                 libxml_clear_errors();
                 if (!$suppressExceptions) {
                     throw new PrestashopApiException('Error PrestaShop. HTTP XML response is not parsable.', PrestashopApiException::ERROR_XML_PROCESSING, 400,
-                        null, _p('prestashop::exceptions.user.shop.http_xml_response_is_not_parsable', 'Error PrestaShop. HTTP XML response is not parsable.'), $msg, $this->debug);
+                        null, _p('prestashop::exceptions.user.shop.http_xml_response_is_not_parsable', 'Error PrestaShop. HTTP XML response is not parsable.'), $msg, $this->config->isDebug());
                 }
             }
             return $xml;
         }
         elseif (!$suppressExceptions) {
             throw new PrestashopApiException('Error PrestaShop. HTTP response is empty.', PrestashopApiException::ERROR_XML_PROCESSING, 400,
-                null, _p('prestashop::exceptions.user.shop.http_response_is_empty', 'Error PrestaShop. HTTP response is empty.'), null, $this->debug);
+                null, _p('prestashop::exceptions.user.shop.http_response_is_empty', 'Error PrestaShop. HTTP response is empty.'), null, $this->config->isDebug());
         }
         return null;
     }
@@ -286,7 +273,7 @@ class PrestashopApi
     {
         $xml = '';
         if (isset($options['resource'], $options['postXml']) || isset($options['url'], $options['postXml'])) {
-            $url = (isset($options['resource']) ? $this->url . '/api/' . $options['resource'] : $options['url']);
+            $url = (isset($options['resource']) ? $this->config->getUrl() . '/api/' . $options['resource'] : $options['url']);
             $xml = $options['postXml'];
             if (isset($options['id_shop'])) {
                 $url .= '&id_shop=' . $options['id_shop'];
@@ -297,7 +284,7 @@ class PrestashopApi
         }
         else {
             throw new PrestashopApiException('Error PrestaShop. Bad parameters given.', PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, 400,
-                null, _p('prestashop::exceptions.user.shop.bad_parameters_given', 'Error PrestaShop. Bad parameters given.'), null, $this->debug);
+                null, _p('prestashop::exceptions.user.shop.bad_parameters_given', 'Error PrestaShop. Bad parameters given.'), null, $this->config->isDebug());
         }
         $request = $this->executeRequest($url, [
             CURLOPT_CUSTOMREQUEST => 'POST',
@@ -324,7 +311,7 @@ class PrestashopApi
             $url = $options['url'];
         }
         elseif (isset($options['resource'])) {
-            $url = $this->url . '/api/' . $options['resource'];
+            $url = $this->config->getUrl() . '/api/' . $options['resource'];
             $url_params = [];
             if (isset($options['id'])) {
                 $url .= '/' . $options['id'];
@@ -352,25 +339,11 @@ class PrestashopApi
         }
         else {
             throw new PrestashopApiException('Error PrestaShop. Bad parameters given.', PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, 400,
-                null, _p('prestashop::exceptions.user.shop.bad_parameters_given', 'Error PrestaShop. Bad parameters given.'), null, $this->debug);
+                null, _p('prestashop::exceptions.user.shop.bad_parameters_given', 'Error PrestaShop. Bad parameters given.'), null, $this->config->isDebug());
         }
         $request = $this->executeRequest($url, [CURLOPT_CUSTOMREQUEST => 'GET']);
-        $this->checkRequest($request);// check the response validity
+        $this->checkRequest($request);
         return $this->parseXML($request['response']);
-    }
-
-    /**
-     * To array
-     *
-     * @param SimpleXMLElement $xml
-     * @return array
-     */
-    public function toArray(SimpleXMLElement $xml)
-    {
-        $resource = $xml->children()->children();
-        $array = json_decode(json_encode($resource), true, 512, JSON_UNESCAPED_UNICODE);
-        $hasOneItem = !isset(array_values($array)[0][0]);
-        return ($hasOneItem) ? array_values($array) : array_values($array)[0];
     }
 
     /**
@@ -397,7 +370,7 @@ class PrestashopApi
             $url = $options['url'];
         }
         elseif (isset($options['resource'])) {
-            $url = $this->url . '/api/' . $options['resource'];
+            $url = $this->config->getUrl() . '/api/' . $options['resource'];
             $url_params = [];
             if (isset($options['id'])) {
                 $url .= '/' . $options['id'];
@@ -421,13 +394,13 @@ class PrestashopApi
         }
         else {
             throw new PrestashopApiException('Error PrestaShop. Bad parameters given.', PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, 400,
-                null, _p('prestashop::exceptions.user.shop.bad_parameters_given', 'Error PrestaShop. Bad parameters given.'), null, $this->debug);
+                null, _p('prestashop::exceptions.user.shop.bad_parameters_given', 'Error PrestaShop. Bad parameters given.'), null, $this->config->isDebug());
         }
         $request = $this->executeRequest($url, [
             CURLOPT_CUSTOMREQUEST => 'HEAD',
             CURLOPT_NOBODY => true,
         ]);
-        $this->checkRequest($request);// check the response validity
+        $this->checkRequest($request);
         return $request['header'];
     }
 
@@ -454,7 +427,7 @@ class PrestashopApi
                 $url = $options['url'];
             }
             else {
-                $url = $this->url . '/api/' . $options['resource'] . '/' . $options['id'];
+                $url = $this->config->getUrl() . '/api/' . $options['resource'] . '/' . $options['id'];
             }
             $xml = $options['putXml'];
             if (isset($options['id_shop'])) {
@@ -466,13 +439,13 @@ class PrestashopApi
         }
         else {
             throw new PrestashopApiException('Error PrestaShop. Bad parameters given.', PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, 400,
-                null, _p('prestashop::exceptions.user.shop.bad_parameters_given', 'Error PrestaShop. Bad parameters given.'), null, $this->debug);
+                null, _p('prestashop::exceptions.user.shop.bad_parameters_given', 'Error PrestaShop. Bad parameters given.'), null, $this->config->isDebug());
         }
         $request = $this->executeRequest($url, [
             CURLOPT_CUSTOMREQUEST => 'PUT',
             CURLOPT_POSTFIELDS => $xml,
         ]);
-        $this->checkRequest($request);// check the response validity
+        $this->checkRequest($request);
         return $this->parseXML($request['response']);
     }
 
@@ -491,10 +464,10 @@ class PrestashopApi
         }
         elseif (isset($options['resource']) && isset($options['id'])) {
             if (is_array($options['id'])) {
-                $url = $this->url . '/api/' . $options['resource'] . '/?id=[' . implode(',', $options['id']) . ']';
+                $url = $this->config->getUrl() . '/api/' . $options['resource'] . '/?id=[' . implode(',', $options['id']) . ']';
             }
             else {
-                $url = $this->url . '/api/' . $options['resource'] . '/' . $options['id'];
+                $url = $this->config->getUrl() . '/api/' . $options['resource'] . '/' . $options['id'];
             }
         }
         if (isset($options['id_shop'])) {
@@ -504,7 +477,7 @@ class PrestashopApi
             $url .= '&id_group_shop=' . $options['id_group_shop'];
         }
         $request = $this->executeRequest($url, [CURLOPT_CUSTOMREQUEST => 'DELETE']);
-        $this->checkRequest($request);// check the response validity
+        $this->checkRequest($request);
         return true;
     }
 

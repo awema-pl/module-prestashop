@@ -3,7 +3,7 @@
 namespace AwemaPL\Prestashop\User\Sections\Shops\Repositories;
 
 use AwemaPL\Prestashop\Admin\Sections\Settings\Repositories\Contracts\SettingRepository;
-use AwemaPL\Prestashop\Client\Contracts\PrestashopClient;
+use AwemaPL\Prestashop\Client\PrestashopClient;
 use AwemaPL\Prestashop\User\Sections\Shops\Models\Shop;
 use AwemaPL\Prestashop\User\Sections\Shops\Repositories\Contracts\ShopRepository;
 use AwemaPL\Prestashop\User\Sections\Shops\Scopes\EloquentShopScopes;
@@ -13,14 +13,6 @@ use Illuminate\Support\Facades\Auth;
 
 class EloquentShopRepository extends BaseRepository implements ShopRepository
 {
-    /** @var PrestashopClient $prestashopClient */
-    protected $prestashopClient;
-
-    public function __construct(PrestashopClient $prestashopClient)
-    {
-        parent::__construct();
-        $this->prestashopClient = $prestashopClient;
-    }
 
     protected $searchable = [
 
@@ -50,10 +42,7 @@ class EloquentShopRepository extends BaseRepository implements ShopRepository
     public function create(array $data)
     {
         $data['user_id'] = $data['user_id'] ?? Auth::id();
-        $apiPrestashop = $this->prestashopClient->getPrestashopApi($data['url'], $data['api_key']);
-        $resource = $apiPrestashop->get(['resource' =>'languages', 'display' =>'[name]', 'filter[id]' =>'['.$data['shop_language_id'].']']);
-        $languages = $apiPrestashop->toArray($resource);
-        $data['shop_language_name'] =$languages[0]['name'];
+        $data['shop_language_name'] =(new PrestashopClient(['url'=>$data['url'], 'api_key' =>$data['api_key']]))->languages()->getNameLanguageById($data['shop_language_id']);
         return Shop::create($data);
     }
 
@@ -68,10 +57,7 @@ class EloquentShopRepository extends BaseRepository implements ShopRepository
      */
     public function update(array $data, $id, $attribute = 'id')
     {
-        $apiPrestashop = $this->prestashopClient->getPrestashopApi($data['url'], $data['api_key']);
-        $resource = $apiPrestashop->get(['resource' =>'languages', 'display' =>'[name]', 'filter[id]' =>'['.$data['shop_language_id'].']']);
-        $languages = $apiPrestashop->toArray($resource);
-        $data['shop_language_name'] =$languages[0]['name'];
+        $data['shop_language_name'] =(new PrestashopClient(['url'=>$data['url'], 'api_key' =>$data['api_key']]))->languages()->getNameLanguageById($data['shop_language_id']);
         return parent::update($data, $id, $attribute);
     }
 
@@ -104,16 +90,16 @@ class EloquentShopRepository extends BaseRepository implements ShopRepository
      */
     public function selectLanguage($url, $apiKey)
     {
-        $apiPrestashop = $this->prestashopClient->getPrestashopApi($url, $apiKey);
-        $resource = $apiPrestashop->get(['resource' =>'languages', 'display' =>'[id,name]', 'filter[active]' =>'[1]']);
-        $languages = $apiPrestashop->toArray($resource);
-        $localLanguage = [];
+        $languages = (new PrestashopClient(['url'=>$url, 'api_key' =>$apiKey]))->languages()
+            ->getLanguages(['display' =>'[id,name]', 'filter[active]' =>'[1]'])
+        ->toArray();
+        $data = [];
         foreach ($languages as $language){
-            array_push($localLanguage, [
+            array_push($data, [
                'id' =>(int)$language['id'],
                'name' =>$language['name'],
             ]);
         }
-        return $localLanguage;
+        return $data;
     }
 }
