@@ -135,6 +135,4 @@ class ShopController extends Controller
         }
         return notify(_p('prestashop::notifies.user.shop.success_connected_shop', 'Success connected shop.'));
     }
-
-
 }

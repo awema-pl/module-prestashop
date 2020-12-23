@@ -92,7 +92,7 @@ class EloquentShopRepository extends BaseRepository implements ShopRepository
     {
         $languages = (new PrestashopClient(['url'=>$url, 'api_key' =>$apiKey]))->languages()
             ->getLanguages(['display' =>'[id,name]', 'filter[active]' =>'[1]'])
-        ->toArray();
+            ->getArray('//languages/language');
         $data = [];
         foreach ($languages as $language){
             array_push($data, [

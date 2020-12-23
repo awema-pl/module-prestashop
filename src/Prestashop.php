@@ -108,8 +108,6 @@ class Prestashop implements PrestashopContract
             $this->router
                 ->get('/check-connection/{id?}', '\AwemaPL\Prestashop\User\Sections\Shops\Http\Controllers\ShopController@checkConnection')
                 ->name('check_connection');
-
-
         });
     }
 

@@ -33,7 +33,7 @@ class Language extends Client implements LanguageContract
      */
     public function getNameLanguageById($languageId){
         $response = $this->getLanguages(['display' =>'[name]', 'filter[id]' =>"[$languageId]"]);
-        $languages = $response->toArray();
+        $languages = $response->getArray('//languages/language');
         if (!sizeof($languages)){
             throw new PrestashopApiException('Language not found in PrestaShop.', PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, 400, null, null, null, false);
         }
