@@ -230,17 +230,17 @@ class Client
     /**
      * Load XML from string. Can throw exception
      *
-     * @param string $response String from a CURL response
+     * @param string $content String from a CURL response
      * @param boolean $suppressExceptions Whether to throw exceptions on errors
      * @return SimpleXMLElement status_code, response
      * @throws PrestashopApiException
      */
-    protected function parseXML($response, $suppressExceptions = false)
+    protected function parseXML($content, $suppressExceptions = false)
     {
-        if ($response != '') {
+        if ($content != '') {
             libxml_clear_errors();
             libxml_use_internal_errors(true);
-            $xml = simplexml_load_string($response, 'SimpleXMLElement', LIBXML_NOCDATA);
+            $xml = simplexml_load_string($content, 'SimpleXMLElement', LIBXML_NOCDATA);
             if (libxml_get_errors()) {
                 $msg = var_export(libxml_get_errors(), true);
                 libxml_clear_errors();
