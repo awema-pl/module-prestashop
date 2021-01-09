@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use MrGenis\Library\XmlToArray;
 use RuntimeException;
 use SimpleXMLElement;
+use CurlFile;
 
 class Client
 {
@@ -164,7 +165,7 @@ class Client
         $this->dumpDebug('HTTP REQUEST HEADER', $info['request_header']);
         $this->dumpDebug('HTTP RESPONSE HEADER', $header);
         if ($curl_params[CURLOPT_CUSTOMREQUEST] == 'PUT' || $curl_params[CURLOPT_CUSTOMREQUEST] == 'POST') {
-            $this->dumpDebug('XML SENT', urldecode($curl_params[CURLOPT_POSTFIELDS]));
+            $this->dumpDebug('XML SENT',json_encode($curl_params[CURLOPT_POSTFIELDS], JSON_UNESCAPED_UNICODE));
         }
         if ($curl_params[CURLOPT_CUSTOMREQUEST] != 'DELETE' && $curl_params[CURLOPT_CUSTOMREQUEST] != 'HEAD') {
             $this->dumpDebug('RETURN HTTP BODY', $body);
@@ -481,6 +482,35 @@ class Client
         return true;
     }
 
+    /**
+     * Add file
+     * 
+     * @param array $options
+     * @return bool
+     * @throws PrestashopApiException
+     */
+    public function addFile(array $options)
+    {
+        if (isset($options['url'])) {
+            $url = $options['url'];
+        }
+        elseif (isset($options['resource']) && isset($options['id'])) {
+            $url = $this->config->getUrl() . '/api/' . $options['resource'] . '/' . $options['id'];
+        }
+        if (isset($options['id_shop'])) {
+            $url .= '&id_shop=' . $options['id_shop'];
+        }
+        if (isset($options['id_group_shop'])) {
+            $url .= '&id_group_shop=' . $options['id_group_shop'];
+        }
+        $request = $this->executeRequest($url, [
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => [$options['field'] =>new CurlFile($options['path'], mime_content_type($options['path']))],
+        ]);
+        $this->checkRequest($request);
+        return true;
+    }
+    
     /**
      * Retrieve the resource schema
      *
