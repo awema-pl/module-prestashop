@@ -70,7 +70,7 @@ class Client
         ];
         $details = isset($request['response']) ? $this->parseXML($request['response'], true) : null;
         $httpStatus = $request['status_code'];
-        $message = 'Error request to the PrestaShop API.' . isset($messages[$httpStatus]) ? sprintf(' %s %s', $httpStatus, $messages[$httpStatus]) : '';
+        $message = 'Error request to the PrestaShop API.' . isset($messages[$httpStatus]) ? sprintf(' %s %s', $httpStatus, $messages[$httpStatus]) : $httpStatus;
         if (!isset($details->errors->error)) {
             throw new PrestashopApiException($message, PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, $request['status_code'], null, null, $details->asXML() ?? $details, $this->config->isDebug());
         } else {
