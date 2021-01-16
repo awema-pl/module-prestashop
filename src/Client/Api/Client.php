@@ -74,13 +74,13 @@ class Client
         $statusMsg = isset($messages[$httpStatus]) ? sprintf(' %s %s', $httpStatus, $messages[$httpStatus]) : $httpStatus;
         $message = 'Error request to the PrestaShop API.' . $statusMsg;
         if (!isset($details->errors->error)) {
-            throw new PrestashopApiException($message, PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, $request['status_code'], null, null, $details->asXML() ?? $details, $this->config->isDebug());
+            throw new PrestashopApiException($message, PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, $request['status_code'], null, null, optional($details)->asXML(), $this->config->isDebug());
         } else {
             $prestashopCode = (int)$details->errors->error->code;
             $errorMessage = sprintf('%s (%s).', $details->errors->error->message, $prestashopCode);
             $message .= sprintf(' %s', $errorMessage);
             $errorUserMessage = isset($prestashopUserMessages[$prestashopCode]) ? $prestashopUserMessages[$prestashopCode] : _p('prestashop::exceptions.user.shop.error_request_prestashop_api', 'Error request to the PrestaShop API. :error', ['error' => $errorMessage]);
-            throw new PrestashopApiException($message, PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, $request['status_code'], null, $errorUserMessage, $details->asXML() ?? $details, $this->config->isDebug());
+            throw new PrestashopApiException($message, PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, $request['status_code'], null, $errorUserMessage, optional($details)->asXML(), $this->config->isDebug());
         }
     }
 
