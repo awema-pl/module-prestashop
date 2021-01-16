@@ -34,7 +34,8 @@ class Product extends Client implements ProductContract
      */
     public function deleteProduct(int $id, array $options = []):bool
     {
-        return $this->delete(array_merge(['resource' =>'products', 'id' =>$id], $options));
+        dump('delete ' . $id);
+        return $this->delete(array_merge(['resource' =>'products', 'id' =>$id, 'limit'  => '1'], $options));
     }
 
     /**
