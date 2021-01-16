@@ -61,6 +61,7 @@ class Client
             405 => 'Method Not Allowed.',
             500 => 'Internal Server Error.',
             503 => 'Service Unavailable.',
+            504 => 'Gateway timeout.',
         ];
         $prestashopUserMessages = [
             18 => _p('prestashop::exceptions.user.shop.invalid_api_key_format', 'PrestaShop API error. Invalid API key format.'),
