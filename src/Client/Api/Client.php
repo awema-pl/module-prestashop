@@ -121,7 +121,8 @@ class Client
             CURLOPT_USERPWD => $this->config->getApiKey() . ':',
             CURLOPT_HTTPHEADER => ['Expect:'],
             CURLOPT_SSL_VERIFYPEER => config('app.env') === 'local' ? 0 : 1,
-            CURLOPT_SSL_VERIFYHOST => config('app.env') === 'local' ? 0 : 2
+            CURLOPT_SSL_VERIFYHOST => config('app.env') === 'local' ? 0 : 2,
+            CURLOPT_HTTP_VERSION =>CURL_HTTP_VERSION_1_1,
             // value 1 is not accepted https://curl.haxx.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html
         ];
         $curl_options = [];
