@@ -275,27 +275,50 @@ class Client
      */
     public function add($options)
     {
-        $xml = '';
-        if (isset($options['resource'], $options['postXml']) || isset($options['url'], $options['postXml'])) {
-            $url = (isset($options['resource']) ? $this->config->getUrl() . '/api/' . $options['resource'] : $options['url']);
-            $xml = $options['postXml'];
-            if (isset($options['id_shop'])) {
-                $url .= '&id_shop=' . $options['id_shop'];
+        return $this->withAttempts(function() use (&$options){
+            $xml = '';
+            if (isset($options['resource'], $options['postXml']) || isset($options['url'], $options['postXml'])) {
+                $url = (isset($options['resource']) ? $this->config->getUrl() . '/api/' . $options['resource'] : $options['url']);
+                $xml = $options['postXml'];
+                if (isset($options['id_shop'])) {
+                    $url .= '&id_shop=' . $options['id_shop'];
+                }
+                if (isset($options['id_group_shop'])) {
+                    $url .= '&id_group_shop=' . $options['id_group_shop'];
+                }
             }
-            if (isset($options['id_group_shop'])) {
-                $url .= '&id_group_shop=' . $options['id_group_shop'];
+            else {
+                throw new PrestashopApiException('Error PrestaShop. Bad parameters given.', PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, 400,
+                    null, _p('prestashop::exceptions.user.shop.bad_parameters_given', 'Error PrestaShop. Bad parameters given.'), null, $this->config->isDebug());
             }
+            $request = $this->executeRequest($url, [
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $xml,
+            ]);
+            $this->checkRequest($request);
+            return $this->parseXML($request['response']); 
+        });
+    }
+
+    /**
+     * With attempts
+     *
+     * @param callable $callback
+     * @param int $attempts
+     * @param int $sleep
+     * @return mixed
+     */
+    private function withAttempts(callable $callback, int $attempts = 3, int $sleep = 120){
+        try {
+            return $callback();
+        } catch (Exception $exception){
+            if ($attempts){
+                $attempts--;
+                sleep($sleep);
+                return $this->withAttempts($callback, $attempts, $sleep);
+            }
+            throw $exception;
         }
-        else {
-            throw new PrestashopApiException('Error PrestaShop. Bad parameters given.', PrestashopApiException::ERROR_REQUEST_API_PRESTASHOP, 400,
-                null, _p('prestashop::exceptions.user.shop.bad_parameters_given', 'Error PrestaShop. Bad parameters given.'), null, $this->config->isDebug());
-        }
-        $request = $this->executeRequest($url, [
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => $xml,
-        ]);
-        $this->checkRequest($request);
-        return $this->parseXML($request['response']);
     }
 
     /**
