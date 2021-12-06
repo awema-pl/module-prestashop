@@ -8,7 +8,7 @@ return [
             [
                 'name' => 'Prestashop',
                 'link' => '/prestashop/shops',
-                'icon' => 'speed',
+                'icon' => 'stock',
                 'key' => 'prestashop::menus.prestashop',
                 'children_top' => [
                     [
