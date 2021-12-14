@@ -132,7 +132,7 @@ class Prestashop implements PrestashopContract
      */
     public function isMigrated()
     {
-        $tablesInDb = array_map('reset', DB::select('SHOW TABLES'));
+        $tablesInDb = \DB::connection()->getDoctrineSchemaManager()->listTableNames();
 
         $tables = array_values(config('prestashop.database.tables'));
         foreach ($tables as $table){
