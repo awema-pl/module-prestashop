@@ -41,7 +41,7 @@
         "awema-pl/module-virtual-tour": "dev-master",
         "larapack/config-writer": "^1.0",
         "betterapp/laravel-db-encrypter": "^1.0",
-        "lcobucci/jwt": "^3.3",
+        "lcobucci/jwt": "^4.0",
         "illuminate/support": "~5|~6|~7|~8|~9",
         "ext-curl": "*"
     },
